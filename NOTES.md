@@ -79,46 +79,46 @@ this will launch some services:
 ### Pingcap services
 
 - pd0:pingcap/pd
-  port: 2379
+  - port: 2379
 
 - pd1:pingcap/pd
-  port: 2379
+  - port: 2379
 
 - pd2:pingcap/pd
-  port: 2379
+  - port: 2379
 
 - tikv0:pingcap/tikv
 - tikv1:pingcap/tikv
 - tikv2:pingcap/tikv
 
 - tidb:pingcap/tidb
-  port: 4000
-  port: 10080    
+  - port: 4000
+  - port: 10080    
 
 - tispark-master:pingcap/tispark
-  port: 7077
-  port: 8080
+  - port: 7077
+  - port: 8080
 
 - tispark-slave0:pingcap/tispark
-  port: 38081
+  - port: 38081
 
 - tidb-vision:pingcap/tidb-vision
-  port: 8010
+  - port: 8010
 
 ### Monitor services
 
 - pushgateway:prom/pushgateway
 
 - prometheus:prom/prometheus
-  port: 9090
+  - port: 9090
 
 - grafana:grafana/grafana
-  port: 3000
+  - port: 3000
 
 ### Database services
 
 - surrealdb:surrealdb/surrealdb
-  port: 8000
+  - port: 8000
 
 ### Monitor Services
 
