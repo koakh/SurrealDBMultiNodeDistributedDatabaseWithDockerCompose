@@ -270,7 +270,7 @@ $ ./tearDown.sh
 
 ## Spin Up Docker Stack MINIMAL
 
-this docker stack as a lot of services, we can **slim it** usign the file `docker-compose-minimal.yml`, that have a minimal working version
+this docker stack as a lot of services, we can **slim it** using the file `docker-compose-minimal.yml`, that have a minimal working version
 
 ```shell
 $ cd SurrealDBMultiNodeDistributedDatabaseWithDockerCompose
