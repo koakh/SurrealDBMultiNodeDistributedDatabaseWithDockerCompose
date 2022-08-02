@@ -4,6 +4,9 @@
 
 **WARNING: This is for testing only, DO NOT USE IN PRODUCTION!**
 
+## Always read
+
+- SurrealDB Docker Compose [NOTES](NOTES.md), with minimal stack and other notes about fork changes to work with **SurrealDB**
 ## Requirements
 
 * Docker >= 17.03
@@ -55,4 +58,4 @@ surrealdb         | [2022-08-02 21:48:21] INFO  surrealdb::net Started web serve
 ## Other Notes
 
 - Original [README_FROM_FORK](README_FROM_FORK.md)
-- some SurrealDB Docker Compose [NOTES](NOTES.md)
+
