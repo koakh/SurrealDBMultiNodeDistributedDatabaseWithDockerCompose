@@ -15,7 +15,11 @@
 ## Quick start
 
 ```shell
+# clone project
+$ git clone https://github.com/koakh/SurrealDBMultiNodeDistributedDatabaseWithDockerCompose.git
+# enter path
 $ cd SurrealDBMultiNodeDistributedDatabaseWithDockerCompose
+# spin up stack
 $ docker-compose up -d
 # view logs optional
 $ docker-compose logs -f

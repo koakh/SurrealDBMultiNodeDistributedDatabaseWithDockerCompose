@@ -7,7 +7,9 @@
 ## Clone Project
 
 ```shell
+# clone project
 $ git clone https://github.com/koakh/SurrealDBMultiNodeDistributedDatabaseWithDockerCompose.git
+# enter path
 $ cd SurrealDBMultiNodeDistributedDatabaseWithDockerCompose
 # edit file
 $ nano docker-compose.yml
