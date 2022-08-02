@@ -6,7 +6,8 @@
 
 ## Always read
 
-- SurrealDB Docker Compose [NOTES](NOTES.md), with minimal stack and other notes about fork changes to work with **SurrealDB**
+- SurrealDB Docker Compose [NOTES](NOTES.md), with some test queries, test persistence, paly with stack, tearDown, minimal stack version and other notes about fork changes to work with **SurrealDB**
+
 ## Requirements
 
 * Docker >= 17.03
