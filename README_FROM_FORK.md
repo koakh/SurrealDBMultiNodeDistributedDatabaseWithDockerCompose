@@ -1,8 +1,4 @@
-# TiDB docker-compose
-
-[![Build Status](https://travis-ci.org/pingcap/tidb-docker-compose.svg?branch=master)](https://travis-ci.org/pingcap/tidb-docker-compose)
-
-**WARNING: This is for testing only, DO NOT USE IN PRODUCTION!**
+# SurrealDB TiDB docker-compose
 
 ## Requirements
 
@@ -15,11 +11,7 @@
 ## Quick start
 
 ```bash
-$ git clone https://github.com/pingcap/tidb-docker-compose.git
-$ cd tidb-docker-compose && docker-compose pull # Get the latest Docker images
-$ sudo setenforce 0 # Only on Linux
-$ docker-compose up -d
-$ mysql -h 127.0.0.1 -P 4000 -u root
+$ git clone https://github.com/koakh/SurrealDBMultiNodeDistributedDatabaseWithDockerCompose.git
 ```
 
 * Access monitor at http://localhost:3000 (login with admin/admin if you want to modify grafana)

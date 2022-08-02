@@ -1,4 +1,4 @@
-# TiDB docker-compose
+# SurrealDB TiDB docker-compose
 
 [![Build Status](https://travis-ci.org/pingcap/tidb-docker-compose.svg?branch=master)](https://travis-ci.org/pingcap/tidb-docker-compose)
 
