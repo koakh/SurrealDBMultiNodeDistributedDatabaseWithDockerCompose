@@ -2,11 +2,9 @@ version: '2.1'
 
 services:
 
-  # distributed
-
   pd0:
-    container_name: surrealdb_pd0
     image: pingcap/pd:latest
+    container_name: surrealdb_pd0
     ports:
       - "2379"
     volumes:
@@ -18,52 +16,14 @@ services:
       - --peer-urls=http://0.0.0.0:2380
       - --advertise-client-urls=http://pd0:2379
       - --advertise-peer-urls=http://pd0:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --initial-cluster=pd0=http://pd0:2380
       - --data-dir=/data/pd0
       - --log-file=/logs/pd0.log
-    restart: on-failure
-
-  pd1:
-    container_name: surrealdb_pd1
-    image: pingcap/pd:latest
-    ports:
-      - "2379"
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --name=pd1
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd1:2379
-      - --advertise-peer-urls=http://pd1:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
-      - --data-dir=/data/pd1
-      - --log-file=/logs/pd1.log
-    restart: on-failure
-
-  pd2:
-    container_name: surrealdb_pd2
-    image: pingcap/pd:latest
-    ports:
-      - "2379"
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --name=pd2
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd2:2379
-      - --advertise-peer-urls=http://pd2:2380
-      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
-      - --data-dir=/data/pd2
-      - --log-file=/logs/pd2.log
-    restart: on-failure
+    restart: unless-stopped
 
   tikv0:
-    container_name: surrealdb_tikv0
     image: pingcap/tikv:latest
+    container_name: surrealdb_tikv0
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -71,91 +31,18 @@ services:
       - --addr=0.0.0.0:20160
       - --advertise-addr=tikv0:20160
       - --data-dir=/data/tikv0
-      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --pd=pd0:2379
       - --log-file=/logs/tikv0.log
     depends_on:
-      - "pd0"
-      - "pd1"
-      - "pd2"
+      - pd0
     restart: on-failure
-
-  tikv1:
-    container_name: surrealdb_tikv1
-    image: pingcap/tikv:latest
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv1:20160
-      - --data-dir=/data/tikv1
-      - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-file=/logs/tikv1.log
-    depends_on:
-      - "pd0"
-      - "pd1"
-      - "pd2"
-    restart: on-failure
-
-  tikv2:
-    container_name: surrealdb_tikv2
-    image: pingcap/tikv:latest
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv2:20160
-      - --data-dir=/data/tikv2
-      - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-file=/logs/tikv2.log
-    depends_on:
-      - "pd0"
-      - "pd1"
-      - "pd2"
-    restart: on-failure
-
-  prometheus:
-    container_name: surrealdb_prometheus
-    image: prom/prometheus:v2.2.1
-    user: root
-    command:
-      - --log.level=error
-      - --storage.tsdb.path=/data/prometheus
-      - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./config/pd.rules.yml:/etc/prometheus/pd.rules.yml:ro
-      - ./config/tikv.rules.yml:/etc/prometheus/tikv.rules.yml:ro
-      - ./config/tidb.rules.yml:/etc/prometheus/tidb.rules.yml:ro
-      - ./data:/data
-    restart: on-failure
-
-  grafana:
-    image: grafana/grafana:6.0.1
-    container_name: surrealdb_grafana
-    user: "0"
-    environment:
-      GF_LOG_LEVEL: error
-      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
-      GF_PATHS_CONFIG: /etc/grafana/grafana.ini
-    volumes:
-      - ./config/grafana:/etc/grafana
-      - ./config/dashboards:/tmp/dashboards
-      - ./data/grafana:/var/lib/grafana
-    ports:
-      - "3000:3000"
-    restart: on-failure
-
-  # surrealdb
 
   surrealdb:
     container_name: surrealdb_surrealdb
     image: surrealdb/surrealdb:latest
-    restart: always
+    restart: unless-stopped
     depends_on:
+      - pd0
       - tikv0
     ports:
       - 8000:8000
