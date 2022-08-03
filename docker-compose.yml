@@ -2,12 +2,14 @@ version: '2.1'
 
 services:
 
+  # distributed
+
   pd0:
+    container_name: surrealdb_pd0
     image: pingcap/pd:latest
     ports:
       - "2379"
     volumes:
-      - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -18,16 +20,15 @@ services:
       - --advertise-peer-urls=http://pd0:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd0
-      - --config=/pd.toml
       - --log-file=/logs/pd0.log
     restart: on-failure
 
   pd1:
+    container_name: surrealdb_pd1
     image: pingcap/pd:latest
     ports:
       - "2379"
     volumes:
-      - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -38,16 +39,15 @@ services:
       - --advertise-peer-urls=http://pd1:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd1
-      - --config=/pd.toml
       - --log-file=/logs/pd1.log
     restart: on-failure
 
   pd2:
+    container_name: surrealdb_pd2
     image: pingcap/pd:latest
     ports:
       - "2379"
     volumes:
-      - ./config/pd.toml:/pd.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -58,14 +58,13 @@ services:
       - --advertise-peer-urls=http://pd2:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd2
-      - --config=/pd.toml
       - --log-file=/logs/pd2.log
     restart: on-failure
 
   tikv0:
+    container_name: surrealdb_tikv0
     image: pingcap/tikv:latest
     volumes:
-      - ./config/tikv.toml:/tikv.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -73,7 +72,6 @@ services:
       - --advertise-addr=tikv0:20160
       - --data-dir=/data/tikv0
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --config=/tikv.toml
       - --log-file=/logs/tikv0.log
     depends_on:
       - "pd0"
@@ -82,9 +80,9 @@ services:
     restart: on-failure
 
   tikv1:
+    container_name: surrealdb_tikv1
     image: pingcap/tikv:latest
     volumes:
-      - ./config/tikv.toml:/tikv.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -92,7 +90,6 @@ services:
       - --advertise-addr=tikv1:20160
       - --data-dir=/data/tikv1
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --config=/tikv.toml
       - --log-file=/logs/tikv1.log
     depends_on:
       - "pd0"
@@ -101,9 +98,9 @@ services:
     restart: on-failure
 
   tikv2:
+    container_name: surrealdb_tikv2
     image: pingcap/tikv:latest
     volumes:
-      - ./config/tikv.toml:/tikv.toml:ro
       - ./data:/data
       - ./logs:/logs
     command:
@@ -111,7 +108,6 @@ services:
       - --advertise-addr=tikv2:20160
       - --data-dir=/data/tikv2
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --config=/tikv.toml
       - --log-file=/logs/tikv2.log
     depends_on:
       - "pd0"
@@ -119,78 +115,10 @@ services:
       - "pd2"
     restart: on-failure
 
-  tidb:
-    image: pingcap/tidb:latest
-    ports:
-      # - "4000:4000"
-      - "10080:10080"
-    volumes:
-      - ./config/tidb.toml:/tidb.toml:ro
-      - ./logs:/logs
-    command:
-      - --store=tikv
-      - --path=pd0:2379,pd1:2379,pd2:2379
-      - --config=/tidb.toml
-      - --log-file=/logs/tidb.log
-      - --advertise-address=tidb
-    depends_on:
-      - "tikv0"
-      - "tikv1"
-      - "tikv2"
-    restart: on-failure
-
-  tispark-master:
-    image: pingcap/tispark:v2.1.1
-    command:
-      - /opt/spark/sbin/start-master.sh
-    volumes:
-      - ./config/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
-    environment:
-      SPARK_MASTER_PORT: 7077
-      SPARK_MASTER_WEBUI_PORT: 8080
-    ports:
-      - "7077:7077"
-      - "8080:8080"
-    depends_on:
-      - "tikv0"
-      - "tikv1"
-      - "tikv2"
-    restart: on-failure
-
-  tispark-slave0:
-    image: pingcap/tispark:v2.1.1
-    command:
-      - /opt/spark/sbin/start-slave.sh
-      - spark://tispark-master:7077
-    volumes:
-      - ./config/spark-defaults.conf:/opt/spark/conf/spark-defaults.conf:ro
-    environment:
-      SPARK_WORKER_WEBUI_PORT: 38081
-    ports:
-      - "38081:38081"
-    depends_on:
-      - tispark-master
-    restart: on-failure
-
-
-  tidb-vision:
-    image: pingcap/tidb-vision:latest
-    environment:
-      PD_ENDPOINT: pd0:2379
-    ports:
-      - "8010:8010"
-    restart: on-failure
-
-  # monitors
-  pushgateway:
-    image: prom/pushgateway:v0.3.1
-    command:
-      - --log.level=error
-    restart: on-failure
-
   prometheus:
-    user: root
+    container_name: surrealdb_prometheus
     image: prom/prometheus:v2.2.1
+    user: root
     command:
       - --log.level=error
       - --storage.tsdb.path=/data/prometheus
@@ -207,6 +135,7 @@ services:
 
   grafana:
     image: grafana/grafana:6.0.1
+    container_name: surrealdb_grafana
     user: "0"
     environment:
       GF_LOG_LEVEL: error
@@ -219,9 +148,11 @@ services:
     ports:
       - "3000:3000"
     restart: on-failure
-  
+
+  # surrealdb
+
   surrealdb:
-    container_name: surrealdb
+    container_name: surrealdb_surrealdb
     image: surrealdb/surrealdb:latest
     restart: always
     depends_on:
