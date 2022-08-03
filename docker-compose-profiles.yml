@@ -2,50 +2,11 @@ version: '2.1'
 
 services:
 
-  # non distributed
-
-  pd:
-    image: pingcap/pd:latest
-    profiles: ["default"]
-    hostname: pd0
-    ports:
-      - "2379"
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --name=pd0
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd0:2379
-      - --advertise-peer-urls=http://pd0:2380
-      - --initial-cluster=pd0=http://pd0:2380
-      - --data-dir=/data/pd0
-      - --log-file=/logs/pd0.log
-    restart: unless-stopped
-
-  tikv:
-    image: pingcap/tikv:latest
-    profiles: ["default"]
-    hostname: tikv0
-    volumes:
-      - ./data:/data
-      - ./logs:/logs
-    command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv0:20160
-      - --data-dir=/data/tikv0
-      - --pd=pd0:2379
-      - --log-file=/logs/tikv0.log
-    depends_on:
-      - pd
-    restart: on-failure
-
   # distributed
 
   pd0:
+    container_name: surrealdb_pd0
     image: pingcap/pd:latest
-    profiles: ["distributed"]
     ports:
       - "2379"
     volumes:
@@ -63,8 +24,8 @@ services:
     restart: on-failure
 
   pd1:
+    container_name: surrealdb_pd1
     image: pingcap/pd:latest
-    profiles: ["distributed"]
     ports:
       - "2379"
     volumes:
@@ -82,8 +43,8 @@ services:
     restart: on-failure
 
   pd2:
+    container_name: surrealdb_pd2
     image: pingcap/pd:latest
-    profiles: ["distributed"]
     ports:
       - "2379"
     volumes:
@@ -101,8 +62,8 @@ services:
     restart: on-failure
 
   tikv0:
+    container_name: surrealdb_tikv0
     image: pingcap/tikv:latest
-    profiles: ["distributed"]
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -119,8 +80,8 @@ services:
     restart: on-failure
 
   tikv1:
+    container_name: surrealdb_tikv1
     image: pingcap/tikv:latest
-    profiles: ["distributed"]
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -137,8 +98,8 @@ services:
     restart: on-failure
 
   tikv2:
+    container_name: surrealdb_tikv2
     image: pingcap/tikv:latest
-    profiles: ["distributed"]
     volumes:
       - ./data:/data
       - ./logs:/logs
@@ -155,8 +116,8 @@ services:
     restart: on-failure
 
   prometheus:
+    container_name: surrealdb_prometheus
     image: prom/prometheus:v2.2.1
-    profiles: ["monitors"]
     user: root
     command:
       - --log.level=error
@@ -174,7 +135,7 @@ services:
 
   grafana:
     image: grafana/grafana:6.0.1
-    profiles: ["monitors"]
+    container_name: surrealdb_grafana
     user: "0"
     environment:
       GF_LOG_LEVEL: error
@@ -191,12 +152,11 @@ services:
   # surrealdb
 
   surrealdb:
-    container_name: surrealdb
+    container_name: surrealdb_surrealdb
     image: surrealdb/surrealdb:latest
     restart: always
-    # leave comment it can be tikv or tikv0
-    # depends_on:
-    #   - tikv0
+    depends_on:
+      - tikv0
     ports:
       - 8000:8000
     command: start --log trace --user root --pass root tikv://pd0:2379
