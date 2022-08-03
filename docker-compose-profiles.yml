@@ -194,6 +194,7 @@ services:
     container_name: surrealdb
     image: surrealdb/surrealdb:latest
     restart: always
+    # leave comment it can be tikv or tikv0
     # depends_on:
     #   - tikv0
     ports:
